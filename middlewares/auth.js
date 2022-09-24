@@ -1,3 +1,4 @@
+const { check } = require('express-validator');
 const { User } = require('../models/');
 
 const isAuthorized = (req, res, next) => {
@@ -9,29 +10,33 @@ const isAuthorized = (req, res, next) => {
   }
 };
 
-const uniqueUser = async (req, res, next) => {
-  try {
-    console.log('req.body', req.body, 'middleware');
+const signupValidation = [
+  check('firstName').not().isEmpty().withMessage('please enter firstName.'),
+  check('lastName').not().isEmpty().withMessage('please enter firstName.'),
+  check('email').isEmail().not().withMessage('please enter valid email address.').isEmpty()
+    .withMessage('please enter valid email address.')
+    .custom(async (email) => {
+      const user = await User.findOne({ where: { email } });
+        if(user) {
+          throw new Error('Email already in use');
+        }
+    }).withMessage('User with this email already exists.'),
+  check('password').not().isEmpty().withMessage('please enter password.')
+    .isLength({ min: 6 }).withMessage('password must contain at least six characters.'),
+  check('confirmPassword').not().isEmpty().withMessage('please enter confirm password.')
+    .custom((value, {req}) => { return req.body.password === value})
+    .withMessage("password and confirm password don't match.")
+];
 
-    // const users = await User.findAll({
-    //   where: { email: req.body.email },
-    //   attributes: ['email']
-    // });
-    // console.log(users, 'users');
-    // const user = await User.findOne({
-    //     where: { mail: req.body.email }
-    // });
-    // if (user) {
-    //   return res.status(400).send('User with this email already exists');
-    // }
-    next();
-  } catch (e) {
-    console.log(e);
-    res.status(400).send('something went wrong');
-  }
-};
+const signInValidation = [
+  check('email').isEmail().not().withMessage('please enter valid email address.').isEmpty()
+    .withMessage('please enter valid email address.'),
+  check('password').not().isEmpty().withMessage('please enter password.'),
+]
+
 
 module.exports = {
+  signupValidation,
+  signInValidation,
   isAuthorized,
-  uniqueUser
 }

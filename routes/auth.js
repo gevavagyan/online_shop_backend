@@ -1,10 +1,10 @@
 const { Router } = require('express');
-const { isAuthorized, uniqueUser } = require('../middlewares/auth')
-const { registration } = require('../controlers/auth')
+const { signupValidation, signInValidation } = require('../middlewares/auth')
+const { signUp, login } = require('../controlers/auth')
 
 const router = Router();
 
-router.post('/registration', uniqueUser, registration);
-
+router.post('/registration', signupValidation, signUp);
+router.post('/login', signInValidation, login);
 
 module.exports = router;

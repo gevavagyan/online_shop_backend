@@ -17,14 +17,10 @@ module.exports = {
         type: Sequelize.STRING
       },
       age: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.INTEGER
       },
       email: {
-        allowNull: false,
-        type: Sequelize.STRING
-      },
-      login: {
         allowNull: false,
         type: Sequelize.STRING
       },
